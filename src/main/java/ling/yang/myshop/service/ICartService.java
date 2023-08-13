@@ -1,6 +1,7 @@
 package ling.yang.myshop.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import ling.yang.myshop.Vo.CartVo;
 import ling.yang.myshop.entity.Cart;
 
 /**
@@ -13,4 +14,7 @@ import ling.yang.myshop.entity.Cart;
  */
 public interface ICartService extends IService<Cart> {
 
+    Cart validateSave(Cart entity);
+
+    void validateUpdate(int cartId, CartVo vo);
 }
