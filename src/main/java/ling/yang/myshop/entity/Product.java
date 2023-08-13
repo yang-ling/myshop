@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.Version;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serial;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  * @since 2023-08-13
  */
 @Data
+@Builder
 public class Product implements Serializable {
 
     @Serial
