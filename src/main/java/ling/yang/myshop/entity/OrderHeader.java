@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import ling.yang.myshop.entity.enums.OrderStatus;
+import lombok.Builder;
 import lombok.Data;
+import lombok.With;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,6 +25,8 @@ import java.time.LocalDateTime;
  * @since 2023-08-13
  */
 @Data
+@Builder
+@With
 @TableName("order_header")
 public class OrderHeader implements Serializable {
 
@@ -35,8 +39,6 @@ public class OrderHeader implements Serializable {
     private String orderNo;
 
     private Integer userId;
-
-    private String cardNo;
 
     private LocalDate expiryDate;
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serial;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
  * @since 2023-08-13
  */
 @Data
+@Builder
 @TableName("order_detail")
 public class OrderDetail implements Serializable {
 
