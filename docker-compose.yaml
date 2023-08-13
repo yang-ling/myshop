@@ -1,0 +1,69 @@
+services:
+  mysql:
+    image: 'bitnami/mysql:8.0'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=hNc_s25ZhZFtMMiddhzeUHrTK
+      - MYSQL_DATABASE=myshop
+      - MYSQL_USER=myshop
+      - MYSQL_PASSWORD=myshopmyshop
+      - MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password
+      - MYSQL_CHARACTER_SET=utf8mb4
+      - MYSQL_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - 'mysql_data:/bitnami/mysql/data'
+      - 'mysql_conf:/opt/bitnami/mysql/conf'
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    networks:
+      - myshop_net
+    # expose:
+    #   - '3306'
+    ports:
+      - '3306:3306'
+    restart: always
+  phpmyadmin:
+    image: 'bitnami/phpmyadmin:5'
+    environment:
+      - DATABASE_HOST=mysql
+    ports:
+      - '8203:8080'
+    depends_on:
+      - mysql
+    volumes:
+      - 'phpmyadmin_data:/bitnami'
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    networks:
+      - myshop_net
+    restart: always
+  # ems-backend:
+  #   build:
+  #     context: .
+  #     dockerfile: ems-backend.dockerfile
+  #   image: 'ems/ems-backend'
+  #   ports:
+  #     - '8085:8081'
+  #   depends_on:
+  #     - mysql
+  #   volumes:
+  #     - './image:/image'
+  #     - /etc/timezone:/etc/timezone
+  #     - /etc/localtime:/etc/localtime
+  #   networks:
+  #     - ems_net
+  #   restart: always
+networks:
+  myshop_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.67.0/24"
+volumes:
+  mysql_data:
+    driver: local
+  mysql_conf:
+    driver: local
+  phpmyadmin_data:
+    driver: local
