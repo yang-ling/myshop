@@ -48,7 +48,7 @@ public class OrderHeader implements Serializable {
     private OrderStatus status;
 
     @Version
-    private Integer version;
+    private int version;
 
     @TableLogic
     private int deleted;

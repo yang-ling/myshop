@@ -39,7 +39,7 @@ public class User implements Serializable {
     private String cvcNo;
 
     @Version
-    private Integer version;
+    private int version;
 
     @TableLogic
     private int deleted;

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Builder;
 import lombok.Data;
+import lombok.With;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
  * @since 2023-08-13
  */
 @Data
+@With
 @Builder
 public class Product implements Serializable {
 
@@ -37,7 +39,7 @@ public class Product implements Serializable {
     private Integer amount;
 
     @Version
-    private Integer version;
+    private int version;
 
     @TableLogic
     private int deleted;

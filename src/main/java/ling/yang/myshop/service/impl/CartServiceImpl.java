@@ -38,11 +38,26 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         if (product.getAmount() < entity.getAmount()) {
             throw new RuntimeException("Not Enough Products!");
         }
-        this.save(entity);
-        return entity;
+        Optional<Cart> cart = this.lambdaQuery()
+                                  .eq(Cart::getUserId, entity.getUserId())
+                                  .eq(Cart::getProductId, entity.getProductId())
+                                  .oneOpt();
+        if (cart.isEmpty()) {
+            this.save(entity);
+            return entity;
+        }
+        Cart newCart = cart.get()
+                           .withAmount(cart.get()
+                                           .getAmount() + entity.getAmount());
+        if (product.getAmount() < newCart.getAmount()) {
+            throw new RuntimeException("Not Enough Products!");
+        }
+        this.updateById(newCart);
+        return newCart;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void validateUpdate(int cartId, CartVo vo) {
         Optional<Product> optById = productService.getOptById(vo.getProductId());
         if (optById.isEmpty()) {
@@ -52,13 +67,11 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         if (product.getAmount() < vo.getAmount()) {
             throw new RuntimeException("Not Enough Products!");
         }
+        Cart entity = this.getById(cartId);
+        entity = entity.withAmount(vo.getAmount())
+                       .withProductId(vo.getProductId())
+                       .withUserId(vo.getUserId());
 
-        Cart entity = Cart.builder()
-                          .id(cartId)
-                          .productId(vo.getProductId())
-                          .userId(vo.getUserId())
-                          .amount(vo.getAmount())
-                          .build();
         this.updateById(entity);
     }
 }

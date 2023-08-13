@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +58,11 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
                 return null;
             }
         }
-        User user = userService.getById(userId);
+        Optional<User> optById = userService.getOptById(userId);
+        if (optById.isEmpty()) {
+            return null;
+        }
+        User user = optById.get();
         if (user.getExpiryDate()
                 .isBefore(LocalDate.now())) {
             return null;
@@ -110,12 +115,15 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
         HashMap<Integer, Product> productMap = products.stream()
                                                        .collect(Collectors.toMap(Product::getId, p -> p, (p1, p2) -> p1,
                                                            HashMap::new));
+        List<Product> newProducts = new ArrayList<>();
         for (OrderDetail d : list) {
-            if (d.getAmount() > productMap.get(d.getProductId())
-                                          .getAmount()) {
+            Product product = productMap.get(d.getProductId());
+            if (d.getAmount() > product.getAmount()) {
                 return;
             }
+            newProducts.add(product.withAmount(product.getAmount() - d.getAmount()));
         }
+        productService.updateBatchById(newProducts);
         header = header.withStatus(OrderStatus.PAID);
         this.updateById(header);
     }
@@ -127,7 +135,9 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
                                            .eq(OrderHeader::getUserId, userId)
                                            .eq(OrderHeader::getOrderNo, orderNo)
                                            .oneOpt();
-        if (header.isEmpty()) {
+        if (header.isEmpty()
+            || header.get()
+                     .getStatus() == OrderStatus.PAID) {
             return;
         }
         List<OrderDetail> list = detailService.lambdaQuery()

@@ -43,7 +43,7 @@ public class OrderDetail implements Serializable {
     private BigDecimal price;
 
     @Version
-    private Integer version;
+    private int version;
 
     @TableLogic
     private int deleted;

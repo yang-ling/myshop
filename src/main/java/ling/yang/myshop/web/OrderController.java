@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/product")
+@RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
 public class OrderController {
     private final IOrderHeaderService headerService;
@@ -85,6 +85,7 @@ public class OrderController {
                                                         .cvcNo(h.getCvcNo())
                                                         .status(h.getStatus())
                                                         .grandTotalPrice(grandTotal)
+                                                        .details(detailVos)
                                                         .build();
                                       })
                                       .collect(Collectors.toList());
@@ -143,6 +144,7 @@ public class OrderController {
                       .status(orderHeader.get()
                                          .getStatus())
                       .grandTotalPrice(grandTotal)
+                      .details(detailVos)
                       .build();
     }
 
