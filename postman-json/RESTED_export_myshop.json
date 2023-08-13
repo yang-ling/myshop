@@ -1,0 +1,394 @@
+{
+  "id": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+  "name": "myshop",
+  "requests": [
+    {
+      "id": "c872ccdd-fc06-4a2d-9708-45371eceb75c",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/order/2",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "cardId",
+          "value": "[1,2]",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "f2f82d8d-369e-48a0-827b-f33515e8e294",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "PUT",
+      "url": "http://localhost:8080/api/v1/order/2/2b97361cbbf94a31b8410d901f69df14",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "cardId",
+          "value": "[1,2]",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "5e4787dc-e1bb-44f9-8016-60237a9b73a1",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/order/2",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "cardId",
+          "value": "[1,2]",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "bfbfc64d-3671-49b9-bc31-7a4abd6e0317",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "PUT",
+      "url": "http://localhost:8080/api/v1/cart/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "productId",
+          "value": "2",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "userId",
+          "value": "2",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "7",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cartId",
+          "value": "1",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "0ce0d374-a338-451f-9875-f2fdd3e51bb9",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/cart",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "productId",
+          "value": "2",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "userId",
+          "value": "2",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "5",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "f79bfc02-b91d-4c11-9f72-e177ad1c2f06",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/cart",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "watch",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "value": "700",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "12",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "0d993eba-a67e-4ea3-bd1d-d42245d872c7",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "DELETE",
+      "url": "http://localhost:8080/api/v1/product/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "apple",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "value": "5.12",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "8",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "id",
+          "value": "1",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "166f8833-9038-43ea-8aad-64dcbeeea470",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "PUT",
+      "url": "http://localhost:8080/api/v1/product/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "apple",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "value": "5.12",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "8",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "fbfc8c55-a76c-4b2d-8462-86b9f32fb9bd",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/product/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "apple",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "value": "5.11",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "7",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "b4b64cd1-c575-4fb6-a38c-abfeada922d5",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/product",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "apple",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "price",
+          "value": "5.11",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "amount",
+          "value": "7",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "eda4bb16-56b4-4f19-8610-0e1f80f2c32d",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/user",
+      "headers": "\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "",
+          "value": "",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "967f89dd-ab03-4022-bcf7-30a4d03ed2a6",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "DELETE",
+      "url": "http://localhost:8080/api/v1/user/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "yangling",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cvcNo",
+          "value": "456",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cardNo",
+          "value": "888888",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "expiryDate",
+          "value": "2049-01-01",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "2c615e71-e3f8-4807-a81b-5992af0bd2b8",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "PUT",
+      "url": "http://localhost:8080/api/v1/user/1",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "yangling",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cvcNo",
+          "value": "456",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cardNo",
+          "value": "888888",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "expiryDate",
+          "value": "2049-01-01",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    },
+    {
+      "id": "1eccc638-51bf-4582-b2c1-351b1aa7c3bb",
+      "collectionId": "d9d6dcfd-0579-4aea-aac8-35c989c6bbb7",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/user",
+      "headers": "Content-Type: application/json\n",
+      "dataMode": "urlencoded",
+      "data": [
+        {
+          "key": "name",
+          "value": "yangling",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cvcNo",
+          "value": "123",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "cardNo",
+          "value": "999999",
+          "type": "text",
+          "enabled": true
+        },
+        {
+          "key": "expiryDate",
+          "value": "2049-01-01",
+          "type": "text",
+          "enabled": true
+        }
+      ],
+      "rawModeData": []
+    }
+  ]
+}
