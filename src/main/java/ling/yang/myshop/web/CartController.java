@@ -1,5 +1,7 @@
 package ling.yang.myshop.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ling.yang.myshop.Vo.CartVo;
 import ling.yang.myshop.entity.Cart;
 import ling.yang.myshop.entity.Product;
@@ -22,6 +24,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Cart Controller
+ *
+ * @author yangling
+ */
+
+@Tag(name = "Cart")
 @RestController
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor
@@ -30,6 +39,7 @@ public class CartController {
     private final IProductService productService;
     private final IUserService userService;
 
+    @Operation(summary = "List all cart items" , description = "List all cart items")
     @GetMapping
     public List<CartVo> listCart() {
         return cartService.list()

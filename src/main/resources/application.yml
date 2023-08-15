@@ -32,6 +32,8 @@ mybatis-plus:
     blobType: BLOB
     boolValue: TRUE
 spring:
+  application:
+    name: myshop
   datasource:
     url: jdbc:mysql://localhost:3306/myshop?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: myshop
@@ -48,3 +50,8 @@ spring:
 logging:
   level:
    ling.yang.myshop.mapper: debug
+
+knife4j:
+  enable: true
+  setting:
+    language: en
