@@ -19,6 +19,8 @@ Please see `postman-json/RESTED_export_myshop.json`. You can import it to Postma
 
 Or you can just view it by your favorite json viewer.
 
+If you have run this project, you can view its API doc site: http://localhost:8080/doc.html
+
 ## TODOs
 
 Global exception handling. Currently I just throw runtime exception. It's not good. I could use `ExceptionHandler` and `ControllerAdvice` to achieve global exception handling if I have more time.
