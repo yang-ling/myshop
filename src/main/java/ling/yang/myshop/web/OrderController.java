@@ -1,5 +1,6 @@
 package ling.yang.myshop.web;
 
+import io.swagger.v3.oas.annotations.Operation;
 import ling.yang.myshop.Vo.OrderDetailVo;
 import ling.yang.myshop.Vo.OrderVo;
 import ling.yang.myshop.entity.OrderDetail;
@@ -90,6 +91,7 @@ public class OrderController {
      * @param cartId
      * @return
      */
+    @Operation(summary = "Place an order", description = "Place an order")
     @PostMapping("/{userId}/{orderNo}")
     public OrderVo placeOrder(@PathVariable int userId, @PathVariable String orderNo,
         @RequestBody List<Integer> cartId) {
@@ -97,12 +99,14 @@ public class OrderController {
         return this.oneOrder(userId, orderNo);
     }
 
+    @Operation(summary = "Pay an order", description = "Pay an order. Its status will be PAID")
     @PutMapping("/{userId}/{orderNo}")
     public OrderVo payOrder(@PathVariable int userId, @PathVariable String orderNo) {
         headerService.validatePay(userId, orderNo);
         return this.oneOrder(userId, orderNo);
     }
 
+    @Operation(summary = "Cancel an order", description = "Cancel an order")
     @DeleteMapping("/{userId}/{orderNo}")
     public OrderVo cancelOrder(@PathVariable int userId, @PathVariable String orderNo) {
         headerService.cancelOrder(userId, orderNo);

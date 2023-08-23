@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @PostMapping
-    public int register(@RequestBody UserVo user) {
+    public UserVo register(@RequestBody UserVo user) {
         User entity = User.builder()
                           .name(user.getName())
                           .cvcNo(user.getCvcNo())
@@ -51,7 +51,7 @@ public class UserController {
                           .expiryDate(user.getExpiryDate())
                           .build();
         userService.save(entity);
-        return entity.getId();
+        return oneUser(entity.getId());
     }
 
     @PutMapping("/{userId}")

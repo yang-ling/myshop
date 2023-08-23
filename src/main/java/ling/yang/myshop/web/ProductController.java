@@ -59,7 +59,7 @@ public class ProductController {
         if (optById.isEmpty()) {
             throw new MyShopException(PRODUCT_NOT_FOUND);
         }
-        productService.updateById(Product.of(vo));
+        productService.updateById(Product.of(vo, productId));
         return this.oneProduct(productId);
     }
 

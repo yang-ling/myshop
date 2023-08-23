@@ -5,10 +5,12 @@ import ling.yang.myshop.entity.Product;
 import ling.yang.myshop.entity.User;
 import lombok.Builder;
 import lombok.Data;
+import lombok.With;
 
 import java.math.BigDecimal;
 
 @Data
+@With
 @Builder
 public class CartVo {
 

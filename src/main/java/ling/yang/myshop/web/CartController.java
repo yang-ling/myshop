@@ -43,9 +43,11 @@ public class CartController {
     private final IUserService userService;
 
     @Operation(summary = "List all cart items", description = "List all cart items")
-    @GetMapping
-    public List<CartVo> listCart() {
-        return cartService.list()
+    @GetMapping("/{userId}")
+    public List<CartVo> listCart(@PathVariable int userId) {
+        return cartService.lambdaQuery()
+                          .eq(Cart::getUserId, userId)
+                          .list()
                           .stream()
                           .map(e -> {
                               Product product = productService.getById(e.getProductId());
@@ -55,10 +57,13 @@ public class CartController {
                           .collect(Collectors.toList());
     }
 
-    @GetMapping("/{cartId}")
-    public CartVo oneCartItem(@PathVariable int cartId) {
+    @GetMapping("/{userId}/{cartId}")
+    public CartVo oneCartItem(@PathVariable int userId, @PathVariable int cartId) {
         return cartService.getOptById(cartId)
                           .map(e -> {
+                              if (e.getUserId() != userId) {
+                                  return null;
+                              }
                               Product product = productService.getById(e.getProductId());
                               User user = userService.getById(e.getUserId());
                               return CartVo.of(e, product, user);
@@ -79,21 +84,29 @@ public class CartController {
         return CartVo.of(newCart, product, user);
     }
 
-    @DeleteMapping("/{cartId}")
-    public boolean removeCartItem(@PathVariable int cartId) {
+    @DeleteMapping("/{userId}/{cartId}")
+    public boolean removeCartItem(@PathVariable int userId, @PathVariable int cartId) {
         Optional<Cart> optById = cartService.getOptById(cartId);
         if (optById.isEmpty()) {
+            return false;
+        }
+        if (optById.get()
+                   .getUserId() != userId) {
             return false;
         }
         return cartService.removeById(cartId);
     }
 
-    @PutMapping("/{cartId}")
-    public boolean updateCartItem(@PathVariable int cartId, @RequestBody CartVo vo) {
+    @PutMapping("/{userId}/{cartId}")
+    public boolean updateCartItem(@PathVariable int userId, @PathVariable int cartId, @RequestBody CartVo vo) {
         Optional<Cart> optById = cartService.getOptById(cartId);
         if (optById.isEmpty()) {
             return false;
         }
-        return cartService.validateUpdate(cartId, vo);
+        if (optById.get()
+                   .getUserId() != userId) {
+            return false;
+        }
+        return cartService.validateUpdate(cartId, vo.withUserId(userId));
     }
 }

@@ -47,9 +47,9 @@ public class Product implements Serializable {
 
     private LocalDateTime updated;
 
-    public static Product of(ProductVo vo) {
+    public static Product of(ProductVo vo, int productId) {
         return Product.builder()
-                      .id(vo.getId())
+                      .id(productId)
                       .name(vo.getName())
                       .price(vo.getPrice())
                       .amount(vo.getAmount())

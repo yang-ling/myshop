@@ -1,6 +1,6 @@
 # My Shop
 
-## Prepare Data
+## Quick start
 
 1. Run `./up.sh`
 2. Mysql should be up. Port is 3306.
@@ -21,6 +21,8 @@ Or you can just view it by your favorite json viewer.
 
 If you have run this project, you can view its API doc site: http://localhost:8080/doc.html
 
+Or http://localhost:8080/swagger-ui/index.html if you prefer swagger ui
+
 ## TODOs
 
-Global exception handling. Currently I just throw runtime exception. It's not good. I could use `ExceptionHandler` and `ControllerAdvice` to achieve global exception handling if I have more time.
+- [x] Global exception handling. Currently I just throw runtime exception. It's not good. I could use `ExceptionHandler` and `ControllerAdvice` to achieve global exception handling if I have more time.
