@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,57 +38,22 @@ public class OrderController {
         List<OrderHeader> headers = headerService.lambdaQuery()
                                                  .eq(OrderHeader::getUserId, userId)
                                                  .list();
-        List<OrderVo> orders = headers.stream()
-                                      .map(h -> {
-                                          List<OrderDetail> details = detailService.lambdaQuery()
-                                                                                   .eq(OrderDetail::getOrderId,
-                                                                                       h.getId())
-                                                                                   .list();
-                                          List<OrderDetailVo> detailVos = details.stream()
-                                                                                 .map(d -> {
-                                                                                     Product product = productService.getById(
-                                                                                         d.getProductId());
-                                                                                     return OrderDetailVo.builder()
-                                                                                                         .id(d.getId())
-                                                                                                         .orderId(
-                                                                                                             h.getId())
-                                                                                                         .cartId(
-                                                                                                             d.getCartId())
-                                                                                                         .productName(
-                                                                                                             product.getName())
-                                                                                                         .productId(
-                                                                                                             d.getProductId())
-                                                                                                         .amount(
-                                                                                                             d.getAmount())
-                                                                                                         .price(
-                                                                                                             d.getPrice())
-                                                                                                         .totalPrice(
-                                                                                                             d.getPrice()
-                                                                                                              .multiply(
-                                                                                                                  new BigDecimal(
-                                                                                                                      d.getAmount())))
-                                                                                                         .build();
-                                                                                 })
-                                                                                 .collect(Collectors.toList());
-                                          BigDecimal grandTotal = detailVos.stream()
-                                                                           .map(OrderDetailVo::getTotalPrice)
-                                                                           .reduce(BigDecimal::add)
-                                                                           .orElse(BigDecimal.ZERO);
-                                          User user = userService.getById(h.getUserId());
-                                          return OrderVo.builder()
-                                                        .id(h.getId())
-                                                        .orderNo(h.getOrderNo())
-                                                        .userId(h.getUserId())
-                                                        .userName(user.getName())
-                                                        .expiryDate(h.getExpiryDate())
-                                                        .cvcNo(h.getCvcNo())
-                                                        .status(h.getStatus())
-                                                        .grandTotalPrice(grandTotal)
-                                                        .details(detailVos)
-                                                        .build();
-                                      })
-                                      .collect(Collectors.toList());
-        return orders;
+        return headers.stream()
+                      .map(h -> {
+                          List<OrderDetail> details = detailService.lambdaQuery()
+                                                                   .eq(OrderDetail::getOrderId, h.getId())
+                                                                   .list();
+                          List<OrderDetailVo> detailVos = details.stream()
+                                                                 .map(d -> {
+                                                                     Product product = productService.getById(
+                                                                         d.getProductId());
+                                                                     return OrderDetailVo.of(d, h, product);
+                                                                 })
+                                                                 .collect(Collectors.toList());
+                          User user = userService.getById(h.getUserId());
+                          return OrderVo.of(h, user, detailVos);
+                      })
+                      .collect(Collectors.toList());
     }
 
     @GetMapping("/{userId}/{orderNo}")
@@ -108,44 +72,12 @@ public class OrderController {
         List<OrderDetailVo> detailVos = orderDetails.stream()
                                                     .map(d -> {
                                                         Product product = productService.getById(d.getProductId());
-                                                        return OrderDetailVo.builder()
-                                                                            .id(d.getId())
-                                                                            .orderId(orderHeader.get()
-                                                                                                .getId())
-                                                                            .cartId(d.getCartId())
-                                                                            .productName(product.getName())
-                                                                            .productId(d.getProductId())
-                                                                            .amount(d.getAmount())
-                                                                            .price(d.getPrice())
-                                                                            .totalPrice(d.getPrice()
-                                                                                         .multiply(new BigDecimal(
-                                                                                             d.getAmount())))
-                                                                            .build();
+                                                        return OrderDetailVo.of(d, orderHeader.get(), product);
                                                     })
                                                     .collect(Collectors.toList());
-        BigDecimal grandTotal = detailVos.stream()
-                                         .map(OrderDetailVo::getTotalPrice)
-                                         .reduce(BigDecimal::add)
-                                         .orElse(BigDecimal.ZERO);
         User user = userService.getById(orderHeader.get()
                                                    .getUserId());
-        return OrderVo.builder()
-                      .id(orderHeader.get()
-                                     .getId())
-                      .orderNo(orderHeader.get()
-                                          .getOrderNo())
-                      .userId(orderHeader.get()
-                                         .getUserId())
-                      .userName(user.getName())
-                      .expiryDate(orderHeader.get()
-                                             .getExpiryDate())
-                      .cvcNo(orderHeader.get()
-                                        .getCvcNo())
-                      .status(orderHeader.get()
-                                         .getStatus())
-                      .grandTotalPrice(grandTotal)
-                      .details(detailVos)
-                      .build();
+        return OrderVo.of(orderHeader.get(), user, detailVos);
     }
 
     @PostMapping("/{userId}")
