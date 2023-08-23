@@ -84,9 +84,16 @@ public class OrderController {
         return OrderVo.of(orderHeader.get(), user, detailVos);
     }
 
-    @PostMapping("/{userId}")
-    public OrderVo placeOrder(@PathVariable int userId, @RequestBody List<Integer> cartId) {
-        String orderNo = headerService.validateSave(userId, cartId);
+    /**
+     * @param userId
+     * @param orderNo Call `/api/v1/token` to generate orderNo
+     * @param cartId
+     * @return
+     */
+    @PostMapping("/{userId}/{orderNo}")
+    public OrderVo placeOrder(@PathVariable int userId, @PathVariable String orderNo,
+        @RequestBody List<Integer> cartId) {
+        headerService.validateSave(userId, orderNo, cartId);
         return this.oneOrder(userId, orderNo);
     }
 

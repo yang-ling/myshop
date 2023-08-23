@@ -15,6 +15,7 @@ import ling.yang.myshop.service.IOrderHeaderService;
 import ling.yang.myshop.service.IProductService;
 import ling.yang.myshop.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
  * @author Ling Yang
  * @since 2023-08-13
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, OrderHeader> implements IOrderHeaderService {
@@ -46,7 +48,14 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String validateSave(int userId, List<Integer> cartIds) {
+    public String validateSave(int userId, String orderNo, List<Integer> cartIds) {
+        Optional<OrderHeader> oneOpt = this.lambdaQuery()
+                                           .eq(OrderHeader::getOrderNo, orderNo)
+                                           .oneOpt();
+        if (oneOpt.isPresent()) {
+            log.warn("Order {} already exists.", orderNo);
+            return orderNo;
+        }
         List<Cart> carts = cartService.listByIds(cartIds);
         List<Integer> productIds = carts.stream()
                                         .map(Cart::getProductId)
@@ -70,9 +79,6 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
                 .isBefore(LocalDate.now())) {
             throw new MyShopException(USER_CREDIT_CARD_EXPIRED);
         }
-        String orderNo = UUID.randomUUID()
-                             .toString()
-                             .replace("-", "");
         OrderHeader header = OrderHeader.builder()
                                         .orderNo(orderNo)
                                         .userId(userId)

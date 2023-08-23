@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface IOrderHeaderService extends IService<OrderHeader> {
 
-    String validateSave(int userId, List<Integer> cartIds);
+    String validateSave(int userId, String orderNo, List<Integer> cartIds);
 
     boolean validatePay(int userId, String orderNo);
 
