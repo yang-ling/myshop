@@ -17,7 +17,7 @@ public interface IOrderHeaderService extends IService<OrderHeader> {
 
     String validateSave(int userId, List<Integer> cartIds);
 
-    void validatePay(int userId, String orderNo);
+    boolean validatePay(int userId, String orderNo);
 
     void cancelOrder(int userId, String orderNo);
 }

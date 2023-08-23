@@ -6,10 +6,12 @@ import ling.yang.myshop.Vo.CartVo;
 import ling.yang.myshop.entity.Cart;
 import ling.yang.myshop.entity.Product;
 import ling.yang.myshop.entity.User;
+import ling.yang.myshop.exceptions.MyShopException;
 import ling.yang.myshop.service.ICartService;
 import ling.yang.myshop.service.IProductService;
 import ling.yang.myshop.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,10 +21,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
 
 /**
  * Cart Controller
@@ -32,14 +35,14 @@ import java.util.stream.Collectors;
 
 @Tag(name = "Cart")
 @RestController
-@RequestMapping("/api/v1/cart")
+@RequestMapping(value = "/api/v1/cart", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CartController {
     private final ICartService cartService;
     private final IProductService productService;
     private final IUserService userService;
 
-    @Operation(summary = "List all cart items" , description = "List all cart items")
+    @Operation(summary = "List all cart items", description = "List all cart items")
     @GetMapping
     public List<CartVo> listCart() {
         return cartService.list()
@@ -47,17 +50,7 @@ public class CartController {
                           .map(e -> {
                               Product product = productService.getById(e.getProductId());
                               User user = userService.getById(e.getUserId());
-                              return CartVo.builder()
-                                           .id(e.getId())
-                                           .productId(e.getProductId())
-                                           .productName(product.getName())
-                                           .price(product.getPrice())
-                                           .amount(e.getAmount())
-                                           .totalPrice(product.getPrice()
-                                                              .multiply(new BigDecimal(e.getAmount())))
-                                           .userId(e.getUserId())
-                                           .userName(user.getName())
-                                           .build();
+                              return CartVo.of(e, product, user);
                           })
                           .collect(Collectors.toList());
     }
@@ -68,47 +61,39 @@ public class CartController {
                           .map(e -> {
                               Product product = productService.getById(e.getProductId());
                               User user = userService.getById(e.getUserId());
-                              return CartVo.builder()
-                                           .id(e.getId())
-                                           .productId(e.getProductId())
-                                           .productName(product.getName())
-                                           .price(product.getPrice())
-                                           .amount(e.getAmount())
-                                           .totalPrice(product.getPrice()
-                                                              .multiply(new BigDecimal(e.getAmount())))
-                                           .userId(e.getUserId())
-                                           .userName(user.getName())
-                                           .build();
+                              return CartVo.of(e, product, user);
                           })
-                          .orElse(null);
+                          .orElseThrow(() -> new MyShopException(CART_ITEM_NOT_FOUND));
     }
 
     @PostMapping
-    public int addCartItem(@RequestBody CartVo vo) {
+    public CartVo addCartItem(@RequestBody CartVo vo) {
         Cart entity = Cart.builder()
                           .productId(vo.getProductId())
                           .userId(vo.getUserId())
                           .amount(vo.getAmount())
                           .build();
         Cart newCart = cartService.validateSave(entity);
-        return newCart.getId();
+        Product product = productService.getById(newCart.getProductId());
+        User user = userService.getById(newCart.getUserId());
+        return CartVo.of(newCart, product, user);
     }
 
     @DeleteMapping("/{cartId}")
-    public void removeCartItem(@PathVariable int cartId) {
+    public boolean removeCartItem(@PathVariable int cartId) {
         Optional<Cart> optById = cartService.getOptById(cartId);
         if (optById.isEmpty()) {
-            return;
+            return false;
         }
-        cartService.removeById(cartId);
+        return cartService.removeById(cartId);
     }
 
     @PutMapping("/{cartId}")
-    public void updateCartItem(@PathVariable int cartId, @RequestBody CartVo vo) {
+    public boolean updateCartItem(@PathVariable int cartId, @RequestBody CartVo vo) {
         Optional<Cart> optById = cartService.getOptById(cartId);
         if (optById.isEmpty()) {
-            return;
+            return false;
         }
-        cartService.validateUpdate(cartId, vo);
+        return cartService.validateUpdate(cartId, vo);
     }
 }

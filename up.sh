@@ -2,4 +2,4 @@
 set -xeuo pipefail
 IFS=$'\n\t'
 
-./run.sh up -d --build
+./run.sh up -d --build "$@"

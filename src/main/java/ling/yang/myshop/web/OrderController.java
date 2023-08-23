@@ -6,11 +6,13 @@ import ling.yang.myshop.entity.OrderDetail;
 import ling.yang.myshop.entity.OrderHeader;
 import ling.yang.myshop.entity.Product;
 import ling.yang.myshop.entity.User;
+import ling.yang.myshop.exceptions.MyShopException;
 import ling.yang.myshop.service.IOrderDetailService;
 import ling.yang.myshop.service.IOrderHeaderService;
 import ling.yang.myshop.service.IProductService;
 import ling.yang.myshop.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
+
 @RestController
-@RequestMapping("/api/v1/order")
+@RequestMapping(value = "/api/v1/order", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class OrderController {
     private final IOrderHeaderService headerService;
@@ -63,7 +67,7 @@ public class OrderController {
                                                          .eq(OrderHeader::getOrderNo, orderNo)
                                                          .oneOpt();
         if (orderHeader.isEmpty()) {
-            return null;
+            throw new MyShopException(ORDER_ITEM_NOT_FOUND);
         }
         List<OrderDetail> orderDetails = detailService.lambdaQuery()
                                                       .eq(OrderDetail::getOrderId, orderHeader.get()
@@ -81,17 +85,20 @@ public class OrderController {
     }
 
     @PostMapping("/{userId}")
-    public String placeOrder(@PathVariable int userId, @RequestBody List<Integer> cartId) {
-        return headerService.validateSave(userId, cartId);
+    public OrderVo placeOrder(@PathVariable int userId, @RequestBody List<Integer> cartId) {
+        String orderNo = headerService.validateSave(userId, cartId);
+        return this.oneOrder(userId, orderNo);
     }
 
     @PutMapping("/{userId}/{orderNo}")
-    public void payOrder(@PathVariable int userId, @PathVariable String orderNo) {
+    public OrderVo payOrder(@PathVariable int userId, @PathVariable String orderNo) {
         headerService.validatePay(userId, orderNo);
+        return this.oneOrder(userId, orderNo);
     }
 
     @DeleteMapping("/{userId}/{orderNo}")
-    public void cancelOrder(@PathVariable int userId, @PathVariable String orderNo) {
+    public OrderVo cancelOrder(@PathVariable int userId, @PathVariable String orderNo) {
         headerService.cancelOrder(userId, orderNo);
+        return this.oneOrder(userId, orderNo);
     }
 }

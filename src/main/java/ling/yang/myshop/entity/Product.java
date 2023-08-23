@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.Version;
+import ling.yang.myshop.Vo.ProductVo;
 import lombok.Builder;
 import lombok.Data;
 import lombok.With;
@@ -46,4 +47,12 @@ public class Product implements Serializable {
 
     private LocalDateTime updated;
 
+    public static Product of(ProductVo vo) {
+        return Product.builder()
+                      .id(vo.getId())
+                      .name(vo.getName())
+                      .price(vo.getPrice())
+                      .amount(vo.getAmount())
+                      .build();
+    }
 }

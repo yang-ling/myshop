@@ -2,8 +2,10 @@ package ling.yang.myshop.web;
 
 import ling.yang.myshop.Vo.UserVo;
 import ling.yang.myshop.entity.User;
+import ling.yang.myshop.exceptions.MyShopException;
 import ling.yang.myshop.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +19,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
+
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping(value = "/api/v1/user", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserController {
     private final IUserService userService;
@@ -35,7 +39,7 @@ public class UserController {
     public UserVo oneUser(@PathVariable int userId) {
         return userService.getOptById(userId)
                           .map(UserVo::of)
-                          .orElse(null);
+                          .orElseThrow(() -> new MyShopException(USER_NOT_FOUND));
     }
 
     @PostMapping
@@ -51,10 +55,10 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public void update(@PathVariable int userId, @RequestBody UserVo user) {
+    public boolean update(@PathVariable int userId, @RequestBody UserVo user) {
         Optional<User> optById = userService.getOptById(userId);
         if (optById.isEmpty()) {
-            throw new RuntimeException("No User Found!");
+            throw new MyShopException(USER_NOT_FOUND);
         }
         User entity = User.builder()
                           .id(userId)
@@ -63,15 +67,15 @@ public class UserController {
                           .cardNo(user.getCardNo())
                           .expiryDate(user.getExpiryDate())
                           .build();
-        userService.updateById(entity);
+        return userService.updateById(entity);
     }
 
     @DeleteMapping("/{userId}")
-    public void remove(@PathVariable int userId) {
+    public boolean remove(@PathVariable int userId) {
         Optional<User> optById = userService.getOptById(userId);
         if (optById.isEmpty()) {
-            return;
+            return false;
         }
-        userService.removeById(userId);
+        return userService.removeById(userId);
     }
 }

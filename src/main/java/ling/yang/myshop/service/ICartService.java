@@ -16,5 +16,5 @@ public interface ICartService extends IService<Cart> {
 
     Cart validateSave(Cart entity);
 
-    void validateUpdate(int cartId, CartVo vo);
+    boolean validateUpdate(int cartId, CartVo vo);
 }

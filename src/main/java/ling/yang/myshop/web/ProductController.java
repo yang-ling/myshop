@@ -2,8 +2,10 @@ package ling.yang.myshop.web;
 
 import ling.yang.myshop.Vo.ProductVo;
 import ling.yang.myshop.entity.Product;
+import ling.yang.myshop.exceptions.MyShopException;
 import ling.yang.myshop.service.IProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +19,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
+
 @RestController
-@RequestMapping("/api/v1/product")
+@RequestMapping(value = "/api/v1/product", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
@@ -35,41 +39,36 @@ public class ProductController {
     public ProductVo oneProduct(@PathVariable int productId) {
         return productService.getOptById(productId)
                              .map(ProductVo::of)
-                             .orElse(null);
+                             .orElseThrow(() -> new MyShopException(PRODUCT_NOT_FOUND));
     }
 
     @PostMapping
-    public int addProduct(@RequestBody ProductVo vo) {
+    public ProductVo addProduct(@RequestBody ProductVo vo) {
         Product entity = Product.builder()
                                 .name(vo.getName())
                                 .price(vo.getPrice())
                                 .amount(vo.getAmount())
                                 .build();
         productService.save(entity);
-        return entity.getId();
+        return this.oneProduct(entity.getId());
     }
 
     @PutMapping("/{productId}")
-    public void updateProduct(@PathVariable int productId, @RequestBody ProductVo vo) {
+    public ProductVo updateProduct(@PathVariable int productId, @RequestBody ProductVo vo) {
         Optional<Product> optById = productService.getOptById(productId);
         if (optById.isEmpty()) {
-            return;
+            throw new MyShopException(PRODUCT_NOT_FOUND);
         }
-        Product entity = Product.builder()
-                                .id(vo.getId())
-                                .name(vo.getName())
-                                .price(vo.getPrice())
-                                .amount(vo.getAmount())
-                                .build();
-        productService.updateById(entity);
+        productService.updateById(Product.of(vo));
+        return this.oneProduct(productId);
     }
 
     @DeleteMapping("/{productId}")
-    public void removeProduct(@PathVariable int productId) {
+    public boolean removeProduct(@PathVariable int productId) {
         Optional<Product> optById = productService.getOptById(productId);
         if (optById.isEmpty()) {
-            return;
+            throw new MyShopException(PRODUCT_NOT_FOUND);
         }
-        productService.removeById(productId);
+        return productService.removeById(productId);
     }
 }

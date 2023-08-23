@@ -7,6 +7,7 @@ import ling.yang.myshop.entity.OrderHeader;
 import ling.yang.myshop.entity.Product;
 import ling.yang.myshop.entity.User;
 import ling.yang.myshop.entity.enums.OrderStatus;
+import ling.yang.myshop.exceptions.MyShopException;
 import ling.yang.myshop.mapper.OrderHeaderMapper;
 import ling.yang.myshop.service.ICartService;
 import ling.yang.myshop.service.IOrderDetailService;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
 
 /**
  * <p>
@@ -55,17 +58,17 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
         for (Cart c : carts) {
             if (c.getAmount() > productMap.get(c.getProductId())
                                           .getAmount()) {
-                return null;
+                throw new MyShopException(NOT_ENOUGH_PRODUCT);
             }
         }
         Optional<User> optById = userService.getOptById(userId);
         if (optById.isEmpty()) {
-            return null;
+            throw new MyShopException(USER_NOT_FOUND);
         }
         User user = optById.get();
         if (user.getExpiryDate()
                 .isBefore(LocalDate.now())) {
-            return null;
+            throw new MyShopException(USER_CREDIT_CARD_EXPIRED);
         }
         String orderNo = UUID.randomUUID()
                              .toString()
@@ -95,11 +98,11 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void validatePay(int userId, String orderNo) {
+    public boolean validatePay(int userId, String orderNo) {
         User user = userService.getById(userId);
         if (user.getExpiryDate()
                 .isBefore(LocalDate.now())) {
-            return;
+            throw new MyShopException(USER_CREDIT_CARD_EXPIRED);
         }
         OrderHeader header = this.lambdaQuery()
                                  .eq(OrderHeader::getUserId, userId)
@@ -119,13 +122,13 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
         for (OrderDetail d : list) {
             Product product = productMap.get(d.getProductId());
             if (d.getAmount() > product.getAmount()) {
-                return;
+                throw new MyShopException(NOT_ENOUGH_PRODUCT);
             }
             newProducts.add(product.withAmount(product.getAmount() - d.getAmount()));
         }
         productService.updateBatchById(newProducts);
         header = header.withStatus(OrderStatus.PAID);
-        this.updateById(header);
+        return this.updateById(header);
     }
 
     @Override
@@ -138,7 +141,7 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
         if (header.isEmpty()
             || header.get()
                      .getStatus() == OrderStatus.PAID) {
-            return;
+            throw new MyShopException(ORDER_ALREADY_PAID);
         }
         List<OrderDetail> list = detailService.lambdaQuery()
                                               .eq(OrderDetail::getOrderId, header.get()

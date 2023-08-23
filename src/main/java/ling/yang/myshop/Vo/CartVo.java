@@ -1,5 +1,8 @@
 package ling.yang.myshop.Vo;
 
+import ling.yang.myshop.entity.Cart;
+import ling.yang.myshop.entity.Product;
+import ling.yang.myshop.entity.User;
 import lombok.Builder;
 import lombok.Data;
 
@@ -21,4 +24,18 @@ public class CartVo {
     private String userName;
 
     private Integer amount;
+
+    public static CartVo of(Cart e, Product product, User user) {
+        return CartVo.builder()
+                     .id(e.getId())
+                     .productId(e.getProductId())
+                     .productName(product.getName())
+                     .price(product.getPrice())
+                     .amount(e.getAmount())
+                     .totalPrice(product.getPrice()
+                                        .multiply(new BigDecimal(e.getAmount())))
+                     .userId(e.getUserId())
+                     .userName(user.getName())
+                     .build();
+    }
 }
