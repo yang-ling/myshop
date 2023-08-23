@@ -3,12 +3,13 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： mysql:3306
--- 生成日期： 2023-08-13 14:10:19
+-- 生成日期： 2023-08-23 23:16:06
 -- 服务器版本： 8.0.34
 -- PHP 版本： 8.2.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -64,10 +65,9 @@ CREATE TABLE `order_header` (
   `id` int UNSIGNED NOT NULL,
   `order_no` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
   `user_id` int UNSIGNED NOT NULL,
-  `card_no` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
   `expiry_date` date NOT NULL,
-  `cvc_no` char(3) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
-  `status` enum('UNPAID','PAID') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'UNPAID',
+  `cvc_no` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
+  `status` enum('UNPAID','PAID') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'UNPAID',
   `version` int UNSIGNED NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -81,7 +81,7 @@ CREATE TABLE `order_header` (
 
 CREATE TABLE `product` (
   `id` int UNSIGNED NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
   `price` decimal(10,2) UNSIGNED NOT NULL DEFAULT '0.00',
   `amount` int UNSIGNED NOT NULL DEFAULT '0',
   `version` int UNSIGNED NOT NULL DEFAULT '0',
@@ -97,18 +97,14 @@ CREATE TABLE `product` (
 
 CREATE TABLE `user` (
   `id` int UNSIGNED NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
-  `card_no` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
+  `card_no` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
   `expiry_date` date NOT NULL,
-  `cvc_no` char(3) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
+  `cvc_no` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '''''',
   `version` int UNSIGNED NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- 转存表中的数据 `user`
---
 
 --
 -- 转储表的索引
@@ -200,9 +196,7 @@ ALTER TABLE `cart`
 -- 限制表 `order_detail`
 --
 ALTER TABLE `order_detail`
-  ADD CONSTRAINT `order_detail_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `order_detail_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `order_header` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `order_detail_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `order_detail_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `order_header` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- 限制表 `order_header`
