@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ling.yang.myshop.exceptions.MyShopExceptionAttributes.*;
@@ -120,6 +119,9 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
         List<Integer> productIds = list.stream()
                                        .map(OrderDetail::getProductId)
                                        .collect(Collectors.toList());
+        List<Integer> cartIds = list.stream()
+                                    .map(OrderDetail::getCartId)
+                                    .collect(Collectors.toList());
         List<Product> products = productService.listByIds(productIds);
         HashMap<Integer, Product> productMap = products.stream()
                                                        .collect(Collectors.toMap(Product::getId, p -> p, (p1, p2) -> p1,
@@ -133,6 +135,7 @@ public class OrderHeaderServiceImpl extends ServiceImpl<OrderHeaderMapper, Order
             newProducts.add(product.withAmount(product.getAmount() - d.getAmount()));
         }
         productService.updateBatchById(newProducts);
+        cartService.removeBatchByIds(cartIds);
         header = header.withStatus(OrderStatus.PAID);
         return this.updateById(header);
     }
