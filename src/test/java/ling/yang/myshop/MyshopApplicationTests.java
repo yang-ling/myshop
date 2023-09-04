@@ -1,8 +1,10 @@
 package ling.yang.myshop;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ling.yang.myshop.Vo.CartVo;
 import ling.yang.myshop.Vo.ProductVo;
 import ling.yang.myshop.Vo.UserVo;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -188,6 +191,112 @@ class MyshopApplicationTests {
 
         // Delete
         assertTrue(removeProduct(productAPI, mapper, testOneUpdated.getId()));
+    }
+
+    private List<CartVo> listCartItems(String cartAPI, ObjectMapper mapper, int userId) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(cartAPI + "/" + userId))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        JavaType listType = mapper.getTypeFactory()
+                                  .constructCollectionType(List.class, CartVo.class);
+        List<CartVo> list = mapper.readValue(mvcResult.getResponse()
+                                                      .getContentAsString(), listType);
+        return list;
+    }
+
+    private CartVo addCartItem(String cartAPI, ObjectMapper mapper, CartVo cartVo) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(cartAPI)
+                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .content(mapper.writeValueAsString(cartVo)))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), CartVo.class);
+    }
+
+    private boolean updateCartItem(String cartAPI, ObjectMapper mapper, CartVo cartVo) throws Exception {
+        String url = cartAPI + "/" + cartVo.getUserId() + "/" + cartVo.getId();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(url)
+                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .content(mapper.writeValueAsString(cartVo)))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), Boolean.class);
+    }
+
+    private boolean removeCartItem(String cartAPI, ObjectMapper mapper, CartVo cartVo) throws Exception {
+        String url = cartAPI + "/" + cartVo.getUserId() + "/" + cartVo.getId();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(url))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), Boolean.class);
+    }
+
+    @Test
+    public void testCart() throws Exception {
+        String cartAPI = "/api/v1/cart";
+        String productAPI = "/api/v1/product";
+        String userAPI = "/api/v1/user";
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        // Prepare cart data
+        UserVo user = UserVo.builder()
+                            .name("test one")
+                            .cvcNo("123")
+                            .cardNo("12345687")
+                            .expiryDate(LocalDate.now()
+                                                 .plusDays(10))
+                            .build();
+        user = register(userAPI, mapper, user);
+
+        ProductVo productVo = ProductVo.builder()
+                                       .name("test product one")
+                                       .price(new BigDecimal("10.25"))
+                                       .amount(23)
+                                       .build();
+        productVo = addProduct(productAPI, mapper, productVo);
+
+        List<CartVo> cartItems = listCartItems(cartAPI, mapper, user.getId());
+        assertEquals(0, cartItems.size());
+
+        // Get, 404
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(cartAPI + "/" + user.getId() + "/" + 1))
+                                     .andExpect(status().isNotFound())
+                                     .andReturn();
+        ErrorResponse err = mapper.readValue(mvcResult.getResponse()
+                                                      .getContentAsString(), ErrorResponse.class);
+        assertEquals(CART_ITEM_NOT_FOUND.getErrMsg(), err.getMessage());
+
+        // Add, too many
+        CartVo cartVo = CartVo.builder()
+                              .productId(productVo.getId())
+                              .userId(user.getId())
+                              .amount(25)
+                              .build();
+        mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(cartAPI)
+                                                          .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                          .content(mapper.writeValueAsString(cartVo)))
+                           .andExpect(status().isUnprocessableEntity())
+                           .andReturn();
+        err = mapper.readValue(mvcResult.getResponse()
+                                        .getContentAsString(), ErrorResponse.class);
+        assertEquals(NOT_ENOUGH_PRODUCT.getErrMsg(), err.getMessage());
+        // Add
+        cartVo = cartVo.withAmount(20);
+        cartVo = addCartItem(cartAPI, mapper, cartVo);
+
+        // Update
+        cartVo = cartVo.withAmount(10);
+        assertTrue(updateCartItem(cartAPI, mapper, cartVo));
+
+        // Delete
+        assertTrue(removeCartItem(cartAPI, mapper, cartVo));
+        assertTrue(removeUser(userAPI, mapper, user.getId()));
+        assertTrue(removeProduct(productAPI, mapper, productVo.getId()));
     }
 
 }

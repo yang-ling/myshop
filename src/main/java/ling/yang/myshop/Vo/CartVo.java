@@ -3,8 +3,10 @@ package ling.yang.myshop.Vo;
 import ling.yang.myshop.entity.Cart;
 import ling.yang.myshop.entity.Product;
 import ling.yang.myshop.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.With;
 
 import java.math.BigDecimal;
@@ -12,6 +14,8 @@ import java.math.BigDecimal;
 @Data
 @With
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CartVo {
 
     private Integer id;
