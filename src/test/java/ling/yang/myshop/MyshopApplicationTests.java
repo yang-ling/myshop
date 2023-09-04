@@ -55,6 +55,16 @@ class MyshopApplicationTests {
                                          .getContentAsString(), UserVo.class);
     }
 
+    private boolean updateUser(String userAPI, ObjectMapper mapper, UserVo user) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(userAPI + "/" + user.getId())
+                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .content(mapper.writeValueAsString(user)))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), Boolean.class);
+    }
+
     private boolean removeUser(String userAPI, ObjectMapper mapper, int userId) throws Exception {
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(userAPI + "/" + userId))
                                      .andExpect(status().isOk())
@@ -90,6 +100,15 @@ class MyshopApplicationTests {
                                                  .plusDays(10))
                             .build();
         UserVo register = register(userAPI, mapper, user);
+
+        // Update
+        UserVo testOneUpdated = register.withName("test one updated");
+        assertTrue(updateUser(userAPI, mapper, testOneUpdated));
+        mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(userAPI + "/" + testOneUpdated.getId()))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        assertEquals(testOneUpdated, mapper.readValue(mvcResult.getResponse()
+                                                       .getContentAsString(), UserVo.class));
 
         // Delete
         assertTrue(removeUser(userAPI, mapper, register.getId()));

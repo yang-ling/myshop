@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 
 import java.time.LocalDate;
 
 @Data
 @Builder
+@With
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserVo {
