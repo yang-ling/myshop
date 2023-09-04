@@ -1,9 +1,9 @@
 package ling.yang.myshop;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ling.yang.myshop.Vo.ProductVo;
 import ling.yang.myshop.Vo.UserVo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.sql.DataSource;
-import java.awt.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -105,14 +104,92 @@ class MyshopApplicationTests {
         UserVo testOneUpdated = register.withName("test one updated");
         assertTrue(updateUser(userAPI, mapper, testOneUpdated));
         mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(userAPI + "/" + testOneUpdated.getId()))
-                                     .andExpect(status().isOk())
-                                     .andReturn();
+                           .andExpect(status().isOk())
+                           .andReturn();
         assertEquals(testOneUpdated, mapper.readValue(mvcResult.getResponse()
-                                                       .getContentAsString(), UserVo.class));
+                                                               .getContentAsString(), UserVo.class));
 
         // Delete
         assertTrue(removeUser(userAPI, mapper, register.getId()));
     }
+
+    private List<ProductVo> listProduct(String productAPI, ObjectMapper mapper) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(productAPI))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        JavaType listType = mapper.getTypeFactory()
+                                  .constructCollectionType(List.class, ProductVo.class);
+        List<ProductVo> list = mapper.readValue(mvcResult.getResponse()
+                                                         .getContentAsString(), listType);
+        return list;
+    }
+
+    private ProductVo addProduct(String productAPI, ObjectMapper mapper, ProductVo productVo) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(productAPI)
+                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .content(mapper.writeValueAsString(productVo)))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), ProductVo.class);
+    }
+
+    private ProductVo updateProduct(String productAPI, ObjectMapper mapper, ProductVo testOneUpdated) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(productAPI + "/" + testOneUpdated.getId())
+                                                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                                                    .content(mapper.writeValueAsString(testOneUpdated)))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), ProductVo.class);
+    }
+
+    private boolean removeProduct(String productAPI, ObjectMapper mapper, int id) throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(productAPI + "/" + id))
+                                     .andExpect(status().isOk())
+                                     .andReturn();
+        return mapper.readValue(mvcResult.getResponse()
+                                         .getContentAsString(), Boolean.class);
+    }
+
+    @Test
+    public void testProductAPI() throws Exception {
+        String productAPI = "/api/v1/product";
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        List<ProductVo> productVos = listProduct(productAPI, mapper);
+        assertEquals(0, productVos.size());
+
+        // Get, 404
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(productAPI + "/1"))
+                                     .andExpect(status().isNotFound())
+                                     .andReturn();
+        ErrorResponse err = mapper.readValue(mvcResult.getResponse()
+                                                      .getContentAsString(), ErrorResponse.class);
+        assertEquals(PRODUCT_NOT_FOUND.getErrMsg(), err.getMessage());
+
+        // Add
+        ProductVo productVo = ProductVo.builder()
+                                       .name("test product one")
+                                       .price(new BigDecimal("10.25"))
+                                       .amount(23)
+                                       .build();
+        productVo = addProduct(productAPI, mapper, productVo);
+
+        // Update
+        ProductVo testOneUpdated = productVo.withName("test one product updated");
+        assertEquals(testOneUpdated, updateProduct(productAPI, mapper, testOneUpdated));
+        mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(productAPI + "/" + testOneUpdated.getId()))
+                           .andExpect(status().isOk())
+                           .andReturn();
+        assertEquals(testOneUpdated, mapper.readValue(mvcResult.getResponse()
+                                                               .getContentAsString(), ProductVo.class));
+
+        // Delete
+        assertTrue(removeProduct(productAPI, mapper, testOneUpdated.getId()));
+    }
+
 }
 
 class ErrorResponse {
